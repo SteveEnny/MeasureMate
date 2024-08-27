@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Customer extends Model
 {
     use HasFactory;
+   protected $fillable = ['name', 'phone', 'address', 'user_id']; // fillable fields
 
     public function user() : BelongsTo {
         return $this->belongsTo(User::class);
