@@ -5,17 +5,23 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+
+    public function __construct() {
+        // $this->middleware('auth:api');
+        $this->authorizeResource(Customer::class, 'customer');
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // return CustomerResource::collection(Customer::with('user', 'measurement')->get());
-        return CustomerResource::collection(Customer::all());
+        return CustomerResource::collection(Customer::where('user_id' ,$request->user()->id)->get());
     }
 
     /**
@@ -31,7 +37,7 @@ class CustomerController extends Controller
 
         $customer = Customer::create([
             ...$customer_details,
-            'user_id' => 1,
+            'user_id' => $request->user()->id,
         ]);
 
         return  CustomerResource::make($customer);
