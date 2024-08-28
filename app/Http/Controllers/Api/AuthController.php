@@ -14,7 +14,7 @@ class AuthController extends Controller
         // return response()->json(['message' => 'Login successfully'], 200);
         $request->validate([
             'email' => 'required | email',
-            'password' => 'required | password',
+            'password' => 'required',
         ]);
         $user = User::where('email', $request->email)->first();
         if(!$user) {
@@ -30,10 +30,17 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('api-token')->publicTextToken;
+        $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
             "token" => $token,
+        ]);
+    }
+
+    public function logout(Request $request) {
+        $request->user()->tokens()->delete();
+        return response([
+            'message' => 'Logged out successfully',
         ]);
     }
 }
