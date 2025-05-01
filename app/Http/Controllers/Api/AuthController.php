@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Auth\LoginAction;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ResponseTrait;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,37 +12,27 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use ResponseTrait;
     public function login(Request $request) {
-        // return response()->json(['message' => 'Login successfully'], 200);
-        $request->validate([
-            'email' => 'required | email',
-            'password' => 'required',
-        ]);
-        $user = User::where('email', $request->email)->first();
-        if(!$user) {
-            // return response()->json(['message' => 'User not found'], 404);
-            throw ValidationException::withMessages([
-                'email' => ['The provided crediental are incorrect'],
+        try{
+
+            // return response()->json(['message' => 'Login successfully'], 200);
+            $request->validate([
+                'email' => 'required | email',
+                'password' => 'required',
             ]);
+
+            $validatedData = $request->only(['email', 'password']);
+            return (new LoginAction())->execute($validatedData);
         }
-
-        if(!Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credential are incorrect.']
-            ]);
+        catch(\Exception $exception){
+            logger($exception);
+            return $this->badRequestResponse("Application error | {$exception->getMessage()}");
         }
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            "token" => $token,
-        ]);
     }
 
     public function logout(Request $request) {
         $request->user()->tokens()->delete();
-        return response([
-            'message' => 'Logged out successfully',
-        ]);
+        return $this->successResponse("Logged out successfully");
     }
 }

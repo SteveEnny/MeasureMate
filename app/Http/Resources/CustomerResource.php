@@ -14,6 +14,26 @@ class CustomerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'type' => 'customer',
+            'id' => $this->id,
+            'attributes' => [
+                'name' => $this->name,
+                'phone' => $this->phone,
+                'address' => $this->address,
+                'createdAt' => $this->created_at,
+                'updatedAt' => $this->updated_at,
+                'userId' => $this->user_id,
+            ],
+            'relationships' =>$this->when($request->routeIs('customers.show') ,[
+                'user' => [
+                    'data' =>   [
+                        'type' => 'user',
+                        'id' => $this->user_id,
+                    ]
+                ]
+                    ],)
+                    // 'include' => 
+        ];
     }
 }

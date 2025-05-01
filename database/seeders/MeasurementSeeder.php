@@ -19,7 +19,7 @@ class MeasurementSeeder extends Seeder
         // $cloth_type = ['shirt', 'polo', 'gown', 'trouser',];
         $users = User::all();
         $customers = Customer::all();
-        $body_type = ['top_body', 'bottom_body', 'full_body'];
+        $type = ['top_body', 'bottom_body', 'full_body'];
         foreach($users as $user){
             // $measurement = new Measurement();
             
@@ -33,7 +33,7 @@ class MeasurementSeeder extends Seeder
                 
             $customers_measurement = rand(2, 5);
             for($i = 0;$i < $customers_measurement; $i++) {
-                $cloth_type = Arr::random($body_type);
+                $cloth_type = Arr::random($type);
                 if($cloth_type === 'top_body') {
                     $chest = fake()->randomFloat(2, 25, 35);
                     $neck = fake()->randomFloat(2, 25, 35);
@@ -46,18 +46,22 @@ class MeasurementSeeder extends Seeder
                     Measurement::factory()->create([
                         // 'user_id' => $user->id, // $users->random()->id,
                         'customer_id' => $customer->id,
-                        'chest' => $chest,
-                        'neck' => $neck,
-                        'bust' => $bust,
-                        'waist' => $waist,
-                        'shoulder_width' => $shoulder_width,
-                        'sleeve_length' => $sleeve_length,
-                        'sleeve_opening' => $sleeve_opening,
-                        'arm_length' => $arm_length,
-                        'body_type' => $cloth_type,
+                        'type' => "top",
+                        'measured_values' => [
+                            'chest' => $chest,
+                            'neck' => $neck,
+                            'bust' => $bust,
+                            'waist' => $waist,
+                            'shoulder_width' => $shoulder_width,
+                            'sleeve_length' => $sleeve_length,
+                            'sleeve_opening' => $sleeve_opening,
+                            'arm_length' => $arm_length,
+                            'body_type' => $cloth_type,
+                        ]
+                       
                     ]);
                 }
-                elseif($body_type === 'botton_body') {
+                elseif($type === 'botton_body') {
                     $hips = fake()->randomFloat(2, 25, 35);
                     $outseam = fake()->randomFloat(2, 25, 35);
                     $inseam = fake()->randomFloat(2, 25, 35);
@@ -66,11 +70,15 @@ class MeasurementSeeder extends Seeder
                     Measurement::factory()->create([
                         // 'user_id' => $user->id, // $users->random()->id,
                         'customer_id' => $customer->id,
+                        'type' => "buttom",
+                        'measured_values' => [
                         'hips' => $hips,
                         'outseam' => $outseam,
                         'inseam' => $inseam,
                         'length' => $length,
                         'body_type' => $cloth_type,
+                        ]
+                        
                     ]);
                 }
 
@@ -90,6 +98,8 @@ class MeasurementSeeder extends Seeder
                     Measurement::factory()->create([
                         // 'user_id' => $user->id, // $users->random()->id,
                         'customer_id' => $customer->id,
+                        'type' => "full",
+                        'measured_values' => [
                         'chest' => $chest,
                         'neck' => $neck,
                         'waist' => $waist,
@@ -103,6 +113,9 @@ class MeasurementSeeder extends Seeder
                         'outseam' => $outseam,
                         'inseam' => $inseam,
                         'body_type' => $cloth_type,
+                        ]
+                        
+                        
                         ]);
                 }
             }
