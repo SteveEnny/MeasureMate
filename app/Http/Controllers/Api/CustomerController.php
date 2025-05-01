@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreCustomerRequest;
 use App\Http\Resources\CustomerResource;
+use App\Http\Traits\ResponseTrait;
 use App\Models\Customer;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-
+    use ResponseTrait;
     public function __construct() {
-        // $this->middleware('auth:api');
         $this->authorizeResource(Customer::class, 'customer');
     }
     /**
@@ -20,14 +21,16 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        // return CustomerResource::collection(Customer::with('user', 'measurement')->get());
-        return CustomerResource::collection(Customer::where('user_id' ,$request->user()->id)->get());
+        $name = $request->query('customer_name');
+        $customers = Customer::where('user_id', $request->user()->id)->filter($name)->paginate();
+        // return $this->successResponseWithResource('Success', $customers);
+        return CustomerResource::collection($customers);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
         $customer_details = $request->validate([
             'name' => 'required | max:255 | string',
@@ -58,7 +61,7 @@ class CustomerController extends Controller
     {
         $customer_details = $request->validate([
             'name' => 'sometimes | string',
-            'mac_address' => 'sometimes | string | max:500',
+            'address' => 'sometimes | string | max:500',
             'phone' => 'sometimes | max:15 | numeric',
         ]);
 

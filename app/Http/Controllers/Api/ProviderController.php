@@ -7,6 +7,7 @@ use App\Models\User;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class ProviderController extends Controller
 {
@@ -20,23 +21,25 @@ class ProviderController extends Controller
         // };
     }
 
-    public function handleGoogleCallback() {
+    public function     handleGoogleCallback() {
         try {
             $user = Socialite::driver('google')->stateless()->user();
             //code...
         } catch (ClientException $exception) {
             return response()->json(['error' => "Invaild credentials"]);
         };
-
+        // error_log($user);
         $findOrCreateUser = User::firstOrCreate(
             [
                 'email' => $user->getEmail(),
             ],
             [
+                // 'id' => Str::uuid()->toString(),
                 'name' => $user->getName(),
                 'email_verified_at' => now(),
-            ]
-        );
+                ]
+            );
+            logger($findOrCreateUser);
         $findOrCreateUser->provider()->updateOrCreate([
             'provider' => 'google',
             'provider_id' => $user->getId(),
